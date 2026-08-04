@@ -29,10 +29,10 @@ if ($cart_data && !empty($cart_data['cart_data'])) {
         $menu_stmt->execute([':menu_id' => $item['menuId']]);
         $menu_item = $menu_stmt->fetch(PDO::FETCH_ASSOC);
         
-        $item['image_path'] = $menu_item['image_path'] ?? '/Food_System/assets/images/default-food.jpg';
+        $item['image_path'] = $menu_item['image_path'] ?? '/food-system/food-system-php/assets/images/default-food.jpg';
         // Fix image path if it's relative
-        if (!empty($item['image_path']) && strpos($item['image_path'], '/Food_System/') !== 0) {
-            $item['image_path'] = '/Food_System/' . $item['image_path'];
+        if (!empty($item['image_path']) && strpos($item['image_path'], '/food-system/food-system-php/') !== 0) {
+            $item['image_path'] = '/food-system/food-system-php/' . $item['image_path'];
         }
     }
 }
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - Arko Flavours</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/Food_System/user dashboard/design/userSidebar.css">
+    <link rel="stylesheet" href="/food-system/food-system-php/user dashboard/design/userSidebar.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -575,7 +575,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
         <div class="cart-container fade-in-up">
             <?php if (empty($cart_items)): ?>
                 <div class="empty-cart">
-                    <img src="/Food_System/assets/icons/emptycart.jpg" alt="Empty Cart">
+                    <img src="/food-system/food-system-php/assets/icons/emptycart.jpg" alt="Empty Cart">
                     <h3>Your Cart is Empty</h3>
                     <p>Looks like you haven't added any items to your cart yet.</p>
                     <a href="menu.php" class="cart-btn btn-continue">

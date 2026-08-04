@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_delivered'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Arko Flavors</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/Food_System/user dashboard/design/userDashboard.css">
+    <link rel="stylesheet" href="/food-system/food-system-php/user dashboard/design/userDashboard.css">
     <style>
         .order-details {
             max-width: 300px;

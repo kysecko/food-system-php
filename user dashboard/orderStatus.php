@@ -168,7 +168,7 @@ if (!empty($orders)) {
     <title>Order Status - Food Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/dist/umd/lucide.js">
-    <link rel="stylesheet" href="/Food_System/user dashboard/design/userSidebar.css">
+    <link rel="stylesheet" href="/food-system/food-system-php/user dashboard/design/userSidebar.css">
     <style>
         :root {
             --primary: #667eea;
@@ -948,7 +948,7 @@ if (!empty($orders)) {
             
             <?php if (empty($orders)): ?>
                 <div class="empty-state">
-                    <img src="/Food_System/assets/icons/emptycart.jpg" alt="No orders">
+                    <img src="/food-system/food-system-php/assets/icons/emptycart.jpg" alt="No orders">
                     <h3>No Orders Yet</h3>
                     <p>You haven't placed any orders yet. Start shopping to see your order history here!</p>
                     <a href="menu.php" class="upload-payment-btn" style="text-decoration: none;">

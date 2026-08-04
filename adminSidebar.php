@@ -842,7 +842,7 @@
       </div>
       <div class="modal-footer">
         <button class="modal-btn modal-btn-cancel" id="cancelLogout">Cancel</button>
-        <form action="/Food_System/user dashboard/logout.php" method="post" style="display: inline;">
+        <form action="/food-system/food-system-php/user dashboard/logout.php" method="post" style="display: inline;">
           <button type="submit" class="modal-btn modal-btn-confirm" id="confirmLogout">Logout</button>
         </form>
       </div>

@@ -24,7 +24,7 @@ if (!$user) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/Food_System/user dashboard/design/userProfile.css">
+    <link rel="stylesheet" href="/food-system/food-system-php/user dashboard/design/userProfile.css">
     <style>
        
     </style>

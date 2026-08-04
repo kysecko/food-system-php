@@ -141,7 +141,7 @@ unset($_SESSION['editing_cart_item'], $_SESSION['editing_cart_index']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu - Arko Flavours</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/Food_System/user dashboard/design/userMenu.css">
+    <link rel="stylesheet" href="/food-system/food-system-php/user dashboard/design/userMenu.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .order-restriction-banner {
@@ -242,9 +242,10 @@ unset($_SESSION['editing_cart_item'], $_SESSION['editing_cart_index']);
             $stmt = $pdo->query('SELECT * FROM menu_items WHERE is_available = 1 ORDER BY id DESC');
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 // FIXED: Use absolute path for images
+
                 $imagePath = !empty($row['image_path'])
-                    ? '/Food_System/' . htmlspecialchars($row['image_path'])
-                    : '/Food_System/assets/images/default-food.jpg';
+                    ? '/food-system/food-system-php/' . htmlspecialchars($row['image_path'])
+                    : '/food-system/food-system-php/assets/images/default-food.jpg';
                 
                 $variations = array_map('trim', explode(',', $row['sizes']));
                 $prices = array_map('trim', explode(',', $row['prices']));
