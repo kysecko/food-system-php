@@ -188,7 +188,7 @@ foreach ($menuItems as $item) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Management - Arko Flavors</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-     <link rel="stylesheet" href="/Food_System/admin dashboard/menu/menu.css">
+     <link rel="stylesheet" href="/food-system/food-system-php/admin dashboard/menu/menu.css">
     <style>
         .dynamic-field-group {
             margin-bottom: 1rem;
