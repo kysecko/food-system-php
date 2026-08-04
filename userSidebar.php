@@ -347,7 +347,7 @@
       });
 
       confirmLogout.addEventListener('click', () => {
-        window.location.href = '/Food_System/user%20dashboard/logout.php';
+        window.location.href = '/food-system/food-system-php/user%20dashboard/logout.php';
       });
 
       // Close modal when clicking outside
