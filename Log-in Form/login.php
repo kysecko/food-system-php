@@ -2,13 +2,13 @@
 require_once 'includes/config_session.inc.php';
 require_once 'includes/signup_view.inc.php';
 require_once 'includes/login_view.inc.php';
-require_once 'includes/google-config.php';
-require_once 'includes/facebook-config.php';
+// require_once 'includes/google-config.php';
+// require_once 'includes/facebook-config.php';
 
 // Build Google OAuth2 authorization URL
 $googleAuthParams = [
-    'client_id' => GOOGLE_CLIENT_ID,
-    'redirect_uri' => GOOGLE_REDIRECT_URI,
+    // 'client_id' => GOOGLE_CLIENT_ID,
+    // 'redirect_uri' => GOOGLE_REDIRECT_URI,
     'response_type' => 'code',
     'scope' => 'openid email profile',
     'access_type' => 'offline',
@@ -18,8 +18,8 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
 
 // Build Facebook OAuth2 authorization URL
 $facebookAuthParams = [
-    'client_id' => FACEBOOK_APP_ID,
-    'redirect_uri' => FACEBOOK_REDIRECT_URI,
+    // 'client_id' => FACEBOOK_APP_ID,
+    // 'redirect_uri' => FACEBOOK_REDIRECT_URI,
     'response_type' => 'code',
     'scope' => 'email public_profile'
 ];

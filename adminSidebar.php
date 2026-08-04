@@ -702,20 +702,20 @@
     <nav>
       <ul class="sidebar-menu">
         <li>
-          <a href="/Food_System/admin dashboard/adminDashboard.php">
+          <a href="/food-system/food-system-php/admin dashboard/adminDashboard.php">
             <i data-lucide="layout-dashboard" class="icon"></i>
             <span>Dashboard</span>
           </a>
         </li>
         <li>
-          <a href="/Food_System/admin dashboard/menu/inventory.php">
+          <a href="/food-system/food-system-php/admin dashboard/menu/inventory.php">
             <i data-lucide="box" class="icon"></i>
             <span>Inventory</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/admin dashboard/menu/menu.php">
+          <a href="/food-system/food-system-php/admin dashboard/menu/menu.php">
             <i data-lucide="utensils" class="icon"></i>
             <span>Products</span>
           </a>
@@ -732,24 +732,24 @@
           </div>
           <div class="dropdown-menu">
             <!-- Unified Orders Management -->
-            <a href="/Food_System/admin dashboard/managing orders/manageOrders.php?tab=pending">
+            <a href="/food-system/food-system-php/admin dashboard/managing orders/manageOrders.php?tab=pending">
               <i data-lucide="clock" class="icon"></i> All Orders
             </a>
             <!-- Legacy links for backward compatibility -->
-            <a href="/Food_System/admin dashboard/managing orders/manageOrders.php?tab=pending">
+            <a href="/food-system/food-system-php/admin dashboard/managing orders/manageOrders.php?tab=pending">
               <i data-lucide="clock" class="icon"></i> Pending
             </a>
-            <a href="/Food_System/admin dashboard/managing orders/manageOrders.php?tab=accepted">
+            <a href="/food-system/food-system-php/admin dashboard/managing orders/manageOrders.php?tab=accepted">
               <i data-lucide="check-circle" class="icon"></i> Accepted
             </a>
-            <a href="/Food_System/admin dashboard/managing orders/manageOrders.php?tab=completed">
+            <a href="/food-system/food-system-php/admin dashboard/managing orders/manageOrders.php?tab=completed">
               <i data-lucide="check-square" class="icon"></i> Completed
             </a>
           </div>
         </li>
 
         <li>
-          <a href="/Food_System/admin dashboard/managing orders/payment_invoices.php" class="sidebar-link">
+          <a href="/food-system/food-system-php/admin dashboard/managing orders/payment_invoices.php" class="sidebar-link">
             Payment Proofs [
             <?php
             // Show count of pending payment verifications
@@ -766,14 +766,14 @@
         <div class="section-label">Accounting</div>
 
         <li>
-          <a href="/Food_System/admin dashboard/analytics/sales.php">
+          <a href="/food-system/food-system-php/admin dashboard/analytics/sales.php">
             <i data-lucide="trending-up" class="icon"></i>
             <span>Sales</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/admin dashboard/analytics/expenses.php">
+          <a href="/food-system/food-system-php/admin dashboard/analytics/expenses.php">
             <i data-lucide="trending-down" class="icon"></i>
             <span>Expenses</span>
           </a>
@@ -789,15 +789,15 @@
             <span class="arrow">&#9662;</span>
           </div>
           <div class="dropdown-menu">
-            <a href="/Food_System/admin dashboard/reports/balance_sheet.php">
+            <a href="/food-system/food-system-php/admin dashboard/reports/balance_sheet.php">
               <i data-lucide="credit-card" class="icon"></i> Balance Sheet
             </a>
 
-            <a href="/Food_System/admin dashboard/reports/cashflow.php">
+            <a href="/food-system/food-system-php/admin dashboard/reports/cashflow.php">
               <i data-lucide="banknote" class="icon"></i> Cash Flow
             </a>
 
-            <a href="/Food_System/admin dashboard/reports/income_statement.php">
+            <a href="/food-system/food-system-php/admin dashboard/reports/income_statement.php">
               <i data-lucide="file-text" class="icon"></i> Income Statement
             </a>
 
@@ -805,7 +805,7 @@
         </li>
 
         <li>
-          <a href="/Food_System/admin dashboard/combined_reports.php">
+          <a href="/food-system/food-system-php/admin dashboard/combined_reports.php">
             <i data-lucide="trending-up" class="icon"></i>
             <span>Summary</span>
           </a>
@@ -813,7 +813,7 @@
 
         <!-- Settings Tab -->
         <li>
-          <a href="/Food_System/admin dashboard/settings/settings.php">
+          <a href="/food-system/food-system-php/admin dashboard/settings/settings.php">
             <i data-lucide="settings" class="icon"></i>
             <span>Settings</span>
           </a>

@@ -4,6 +4,6 @@ session_start();
 session_unset();
 session_destroy();
 
-header("Location: /Food_System/Log-in Form/login.php");
+header("Location: /food-system/food-system-php/Log-in Form/login.php");
 
 die();

@@ -258,35 +258,35 @@
     <nav>
       <ul class="sidebar-menu">
         <li>
-          <a href="/Food_System/user%20dashboard/userDashboard.php">
+          <a href="/food-system/food-system-php/user%20dashboard/userDashboard.php">
             <i data-lucide="layout-dashboard" class="icon"></i>
             <span>Dashboard</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/user%20dashboard/menu.php">
+          <a href="/food-system/food-system-php/user%20dashboard/menu.php">
             <i data-lucide="utensils" class="icon"></i>
             <span>Menu</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/user%20dashboard/cart.php">
+          <a href="/food-system/food-system-php/user%20dashboard/cart.php">
             <i data-lucide="shopping-cart" class="icon"></i>
             <span>Cart</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/user%20dashboard/orderStatus.php">
+          <a href="/food-system/food-system-php/user%20dashboard/orderStatus.php">
             <i data-lucide="box" class="icon"></i>
             <span>My Orders</span>
           </a>
         </li>
 
         <li>
-          <a href="/Food_System/user%20dashboard/profile.php">
+          <a href="/food-system/food-system-php/user%20dashboard/profile.php">
             <i data-lucide="user" class="icon"></i>
             <span>Profile</span>
           </a>
