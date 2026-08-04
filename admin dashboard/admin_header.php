@@ -131,8 +131,7 @@ $pageInfo = $pageTitles[$currentFile] ?? ['title' => '⚙️ Admin Panel', 'desc
             font-size: 0.75rem;
             font-weight: 600;
             box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
-        }
-
+        }  
         /* Notification Styles */
         .notification-container {
             position: relative;
