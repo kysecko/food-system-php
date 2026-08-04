@@ -285,7 +285,7 @@ foreach ($menuItems as $item) {
         <div class="menu-actions" data-aos="fade-left" data-aos-duration="1000">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search menu items...">
-                <img src="/Food_System/assets/icons/search.png" alt="search"
+                <img src="/food-system/food-system-php/assets/icons/search.png" alt="search"
                     style="width: 20px; height: 20px; margin-left: 10px;">
             </div>
             <button class="btn btn-primary" id="openAddModalBtn">
@@ -317,7 +317,7 @@ foreach ($menuItems as $item) {
                                     </td>
                                     <td>
                                         <?php if ($item['image_path']): ?>
-                                            <img src="/Food_System/<?= htmlspecialchars($item['image_path']) ?>"
+                                            <img src="/food-system/food-system-php/<?= htmlspecialchars($item['image_path']) ?>"
                                                 alt="<?= htmlspecialchars($item['name']) ?>" class="item-image">
                                         <?php else: ?>
                                             <div class="no-image">No Image</div>
@@ -360,7 +360,7 @@ foreach ($menuItems as $item) {
                             <tr>
                                 <td colspan="6">
                                     <div class="empty-state">
-                                        <img src="/Food_System/assets/icons/no-order.jpg" alt="No Orders" style="width:150px; height: 120px;">
+                                        <img src="/food-system/food-system-php/assets/icons/no-order.jpg" alt="No Orders" style="width:150px; height: 120px;">
                                         <h3>No Menu Items Found</h3>
                                         <p>Get started by adding your first menu item!</p>
                                     </div>
@@ -708,7 +708,7 @@ foreach ($menuItems as $item) {
                 if (image) {
                     imageContainer.innerHTML = `
                         <p><strong>Current Image:</strong></p>
-                        <img src="/Food_System/${image}" alt="Current Image" class="current-image">
+                        <img src="/food-system/food-system-php/${image}" alt="Current Image" class="current-image">
                     `;
                 } else {
                     imageContainer.innerHTML = '<p class="no-image">No current image</p>';
