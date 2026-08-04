@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+h2 {
+  color: #222e3c;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.analytics-section {
+  margin-bottom: 2.5rem;
+}
+
+.analytics-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.5rem 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+/* Analytics Graph Container */
+.analytics-graph-container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 2rem;
+  max-width: 900px;
+  margin: 2rem auto;
+}
+#monthlySalesChart {
+  display: block;
+  margin: 0 auto;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.analytics-table th, .analytics-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.analytics-table th {
+  background: #222e3c;
+  color: #fff;
+  font-weight: 700;
+}
+.analytics-table tr:last-child td {
+  border-bottom: none;
+}
+.analytics-table tr:hover td {
+  background: #f7f7f7;
+}
+
+h2 {
+  color: #222e3c;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}

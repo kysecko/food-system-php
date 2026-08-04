@@ -1,0 +1,765 @@
+<?php
+require_once '../../Log-in Form/includes/config_session.inc.php';
+require_once '../../Log-in Form/includes/dbh.inc.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../../Log-in Form/login.php');
+    exit;
+}
+
+$stmt = $pdo->prepare('SELECT role FROM users WHERE id = :id');
+$stmt->bindParam(':id', $_SESSION['user_id']);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user || $user['role'] !== 'admin') {
+    header('Location: ../../user dashboard/userDashboard.php');
+    exit;
+}
+
+// Accept order logic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_order'])) {
+    $order_id = intval($_POST['order_id']);
+
+    // Get order info
+    $stmt = $pdo->prepare('SELECT * FROM pending_orders WHERE id = ?');
+    $stmt->execute([$order_id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($order) {
+        // Move to accepted_orders
+        $stmt2 = $pdo->prepare('INSERT INTO accepted_orders (user_id, customer_name, total_amount, order_date, order_details) VALUES (?, ?, ?, ?, ?)');
+        $stmt2->execute([$order['user_id'], $order['customer_name'], $order['total_amount'], $order['order_date'], $order['order_details']]);
+
+        // Update order_history status
+        $stmt3 = $pdo->prepare('UPDATE order_history SET status = "accepted" WHERE user_id = ? AND order_date = ?');
+        $stmt3->execute([$order['user_id'], $order['order_date']]);
+
+        // Remove from pending_orders
+        $stmt4 = $pdo->prepare('DELETE FROM pending_orders WHERE id = ?');
+        $stmt4->execute([$order_id]);
+
+        // Send email notification
+        $stmt5 = $pdo->prepare('SELECT email FROM users WHERE id = ?');
+        $stmt5->execute([$order['user_id']]);
+        $userEmail = $stmt5->fetchColumn();
+
+        require_once '../../Log-in Form/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+        require_once '../../Log-in Form/vendor/phpmailer/phpmailer/src/SMTP.php';
+        require_once '../../Log-in Form/vendor/phpmailer/phpmailer/src/Exception.php';
+
+        $mail = new PHPMailer\PHPMailer\PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->Port = 587;
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPAuth = true;
+        $mail->Username = 'luietan04@gmail.com';
+        $mail->Password = 'cqwv qwwg zacn odnz';
+        $mail->setFrom('luietan04@gmail.com', 'Food Shop');
+        $mail->addAddress($userEmail, $order['customer_name']);
+        $mail->Subject = 'Order Accepted - Food Shop';
+        $mail->isHTML(true);
+        $mail->Body = '
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #4361ee;">Order Accepted! 🎉</h2>
+                <p>Dear ' . htmlspecialchars($order['customer_name']) . ',</p>
+                <p>Your order has been accepted by our team! Here are your order details:</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <strong>Order Total: ₱' . number_format($order['total_amount'], 2) . '</strong><br>
+                    <strong>Order Date: ' . date('F j, Y g:i A', strtotime($order['order_date'])) . '</strong>
+                </div>
+                <p><strong>Next Steps:</strong> Please upload your payment screenshot in your dashboard to proceed with the order.</p>
+                <p>Thank you for choosing Food Shop!</p>
+            </div>
+        ';
+        @$mail->send();
+
+        $_SESSION['success_message'] = 'Order accepted and customer notified via email!';
+        header('Location: pendingOrders.php');
+        exit;
+    }
+}
+
+// Get search and filter parameters
+$search = $_GET['search'] ?? '';
+$date_from = $_GET['date_from'] ?? '';
+$date_to = $_GET['date_to'] ?? '';
+$min_amount = $_GET['min_amount'] ?? '';
+$max_amount = $_GET['max_amount'] ?? '';
+
+// Build query with filters
+$query = 'SELECT * FROM pending_orders WHERE 1=1';
+$params = [];
+
+if (!empty($search)) {
+    $query .= ' AND (customer_name LIKE ? OR order_details LIKE ?)';
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+if (!empty($date_from)) {
+    $query .= ' AND DATE(order_date) >= ?';
+    $params[] = $date_from;
+}
+
+if (!empty($date_to)) {
+    $query .= ' AND DATE(order_date) <= ?';
+    $params[] = $date_to;
+}
+
+if (!empty($min_amount)) {
+    $query .= ' AND total_amount >= ?';
+    $params[] = $min_amount;
+}
+
+if (!empty($max_amount)) {
+    $query .= ' AND total_amount <= ?';
+    $params[] = $max_amount;
+}
+
+$query .= ' ORDER BY order_date DESC';
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate statistics
+$total_orders = count($orders);
+$total_revenue = array_sum(array_column($orders, 'total_amount'));
+$avg_order_value = $total_orders > 0 ? $total_revenue / $total_orders : 0;
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Managing Order - Pending Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 2rem;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+            width: calc(100% - 220px);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            color: #222e3c;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s ease;
+        }
+
+        .summary-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #222e3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .description {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .filters-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #222e3c;
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            transition: border-color 0.3s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #4361ee;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #4361ee;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a56e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #4361ee;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #222e3c;
+            font-size: 1.1rem;
+        }
+
+        .order-customer {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .order-amount {
+            font-weight: 600;
+            color: #4361ee;
+            font-size: 1.2rem;
+        }
+
+        .order-date {
+            color: #888;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .order-items {
+            margin: 1rem 0;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #222e3c;
+        }
+
+        .item-meta {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #666;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state div:first-child {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: #222e3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #e8f8f0;
+            color: #2ecc71;
+            border: 1px solid #d4edda;
+        }
+
+        .urgency-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff4e6;
+            color: #e67e22;
+        }
+
+        .status-urgent {
+            background: #ffeaea;
+            color: #e74c3c;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            width: 100%;
+            color: #333;
+            background: transparent;
+        }
+
+        .search-box input::placeholder {
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+            .summary-cards {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+                padding: 1rem;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                justify-content: stretch;
+            }
+
+            .btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .order-actions {
+                justify-content: stretch;
+            }
+
+            .btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <?php include '../../adminSidebar.php'; ?>
+
+    <div class="main-content">
+        <div class="page-header" data-aos="fade-down" data-aos-duration="1000">
+            <h1>Pending Orders</h1>
+            <p>Review and accept your customer orders.</p>
+        </div>
+
+        <?php if (isset($_SESSION['success_message'])): ?>
+            <div class="alert alert-success" style="display: block;">
+                ✅ <?php echo $_SESSION['success_message'];
+                unset($_SESSION['success_message']); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards" data-aos="zoom-in" data-aos-duration="1000">
+            <div class="summary-card">
+                <h3>Pending Orders</h3>
+                <div class="value"><?php echo $total_orders; ?></div>
+                <div class="description">📋 Awaiting approval</div>
+            </div>
+            <div class="summary-card">
+                <h3>Pending Revenue</h3>
+                <div class="value">₱<?php echo number_format($total_revenue, 2); ?></div>
+                <div class="description">💰 Total amount</div>
+            </div>
+            <div class="summary-card">
+                <h3>Average Order</h3>
+                <div class="value">₱<?php echo number_format($avg_order_value, 2); ?></div>
+                <div class="description">📊 Per order</div>
+            </div>
+            <div class="summary-card">
+                <h3>Status</h3>
+                <div class="value"><?php echo $total_orders > 0 ? 'Action Required' : 'All Clear'; ?></div>
+                <div class="description"><?php echo $total_orders > 0 ? '⚠️ Needs attention' : '✅ Up to date'; ?></div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container" data-aos="fade-up" data-aos-duration="1000">
+            <form method="GET" action="">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search">Search Orders</label>
+                        <input type="text" id="search" name="search" class="filter-input"
+                            placeholder="Search by customer or items..."
+                            value="<?php echo htmlspecialchars($search); ?>">
+                    </div>
+                    <div class="filter-group">
+                        <label for="date_from">Date From</label>
+                        <input type="date" id="date_from" name="date_from" class="filter-input"
+                            value="<?php echo htmlspecialchars($date_from); ?>">
+                    </div>
+                    <div class="filter-group">
+                        <label for="date_to">Date To</label>
+                        <input type="date" id="date_to" name="date_to" class="filter-input"
+                            value="<?php echo htmlspecialchars($date_to); ?>">
+                    </div>
+                    <div class="filter-group">
+                        <label for="min_amount">Min Amount</label>
+                        <input type="number" id="min_amount" name="min_amount" class="filter-input" placeholder="0.00"
+                            step="0.01" value="<?php echo htmlspecialchars($min_amount); ?>">
+                    </div>
+                    <div class="filter-group">
+                        <label for="max_amount">Max Amount</label>
+                        <input type="number" id="max_amount" name="max_amount" class="filter-input"
+                            placeholder="1000.00" step="0.01" value="<?php echo htmlspecialchars($max_amount); ?>">
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary"> <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                            height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-list-filter-plus-icon lucide-list-filter-plus">
+                            <path d="M12 5H2" />
+                            <path d="M6 12h12" />
+                            <path d="M9 19h6" />
+                            <path d="M16 5h6" />
+                            <path d="M19 8V2" />
+                        </svg>
+                        Apply Filters</button>
+                    <a href="acceptedOrders.php" class="btn btn-secondary" style="text-decoration: none;"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-brush-cleaning-icon lucide-brush-cleaning">
+                            <path d="m16 22-1-4" />
+                            <path
+                                d="M19 13.99a1 1 0 0 0 1-1V12a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v.99a1 1 0 0 0 1 1" />
+                            <path d="M5 14h14l1.973 6.767A1 1 0 0 1 20 22H4a1 1 0 0 1-.973-1.233z" />
+                            <path d="m8 22 1-4" />
+                        </svg>Clear Filters</a>
+                </div>
+            </form>
+        </div>
+
+        <?php if (empty($orders)): ?>
+            <div class="empty-state">
+                <img src="/Food_System/assets/icons/emptycart.jpg" alt="empty cart" style="width: 100px; height: 100px;">
+                <h3>No Pending Orders</h3>
+                <p>All orders have been processed! Check back later for new orders.</p>
+            </div>
+        <?php else: ?>
+            <div class="orders-list">
+                <?php foreach ($orders as $row):
+                    $order_age = time() - strtotime($row['order_date']);
+                    $is_urgent = $order_age > 3600; // More than 1 hour old
+                    ?>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">
+                                    Order #<?php echo $row['id']; ?>
+                                    <span class="status-badge <?php echo $is_urgent ? 'status-urgent' : 'status-pending'; ?>">
+                                        <?php echo $is_urgent ? '⚠️ URGENT' : '⏳ PENDING'; ?>
+                                    </span>
+                                </div>
+                                <div class="order-customer">👤 <?php echo htmlspecialchars($row['customer_name']); ?></div>
+                                <div class="order-date" style="text-align: left; margin-top: 0.5rem;">
+                                    📅 <?php echo date('M j, Y g:i A', strtotime($row['order_date'])); ?>
+                                    <?php if ($is_urgent): ?>
+                                        <br><small style="color: #e74c3c;">⏰ Waiting for <?php echo round($order_age / 3600, 1); ?>
+                                            hours</small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="order-amount">₱<?php echo number_format($row['total_amount'], 2); ?></div>
+                            </div>
+                        </div>
+
+                        <div class="order-items">
+                            <?php
+                            $orderDetails = json_decode($row['order_details'], true);
+                            if (is_array($orderDetails)):
+                                foreach ($orderDetails as $item):
+                                    $img = '';
+                                    if (!empty($item['menuId'])) {
+                                        $imgStmt = $pdo->prepare('SELECT image_path FROM menu_items WHERE id = ?');
+                                        $imgStmt->execute([$item['menuId']]);
+                                        $imgPath = $imgStmt->fetchColumn();
+                                        if ($imgPath) {
+                                            $img = '<img src="../../assets/images/uploads/' . htmlspecialchars($imgPath) . '" class="item-image">';
+                                        }
+                                    }
+                                    ?>
+                                    <div class="order-item">
+                                        <?php echo $img; ?>
+                                        <div class="item-details">
+                                            <div class="item-name"><?php echo htmlspecialchars($item['name']); ?></div>
+                                            <div class="item-meta">
+                                                Size: <?php echo htmlspecialchars($item['size']); ?> •
+                                                Qty: <?php echo htmlspecialchars($item['qty']); ?>
+                                                <?php if (!empty($item['addons'])): ?>
+                                                    <br>Add-ons: <?php echo htmlspecialchars(implode(', ', $item['addons'])); ?>
+                                                <?php endif; ?>
+                                                <?php if (!empty($item['notes'])): ?>
+                                                    <br>Notes: <?php echo htmlspecialchars($item['notes']); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; endif; ?>
+                        </div>
+
+                        <div class="order-actions">
+                            <form method="post" action="pendingOrders.php" style="display: inline;">
+                                <input type="hidden" name="order_id" value="<?php echo $row['id']; ?>">
+                                <button type="submit" name="accept_order" class="btn btn-success"
+                                    onclick="return confirm('Accept this order? This will notify the customer to upload payment.')">
+                                    ✅ Accept Order
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <script>
+        // Auto-submit form when date inputs change
+        document.getElementById('date_from')?.addEventListener('change', function () {
+            this.form.submit();
+        });
+
+        document.getElementById('date_to')?.addEventListener('change', function () {
+            this.form.submit();
+        });
+
+        // Add loading state to accept buttons
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function () {
+                const button = this.querySelector('button[type="submit"]');
+                if (button) {
+                    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hourglass-icon lucide-hourglass"><path d="M5 22h14" /><path d="M5 2h14" /><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" /><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" /></svg> Processing...';
+                    button.disabled = true;
+                }
+            });
+        });
+
+        // Auto-refresh page every 30 seconds to check for new orders
+        setTimeout(function () {
+            window.location.reload();
+        }, 30000);
+
+        // Add hover effects to order cards
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.order-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)';
+                });
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

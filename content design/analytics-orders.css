@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f7f8fa;
+  color: #222e3c;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main container for page content */
+.page-container {
+  padding: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Heading styling */
+h1, h2 {
+  color: #222e3c;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Section box styling */
+.section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(34,46,60,0.1);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Table styling */
+.analytics-table, .orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.analytics-table th, .orders-table th {
+  background: #ff6b35;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.analytics-table td, .orders-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.analytics-table tr:last-child td, .orders-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Button styling */
+.btn, button, input[type="submit"] {
+  background: #ff6b35;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  text-align: center;
+}
+
+.btn:hover, button:hover, input[type="submit"]:hover {
+  background: #e65c2a;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3em 1em;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.status-cooking { background: #ffe5b4; color: #b85c00; }
+.status-received { background: #d4f8e8; color: #1e824c; }
+.status-to-be-delivered { background: #e3e8ff; color: #2a3cff; }
+.status-completed { background: #e0ffe0; color: #1e824c; }
+.status-pending { background: #fff6b4; color: #b89c00; }
+.status-accepted { background: #b4e1ff; color: #005cb8; }
+
+/* Actions buttons in table */
+.table-actions button {
+  margin-right: 0.8em;
+  padding: 0.6em 1.4em;
+  background-color: #d1e7ff;
+  color: #005cb8;
+  border: 1px solid #b4e1ff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.18s;
+}
+
+.table-actions button:hover {
+  background-color: #b4e1ff;
+}
+
+/* Image for receipt thumbnail */
+img.receipt-thumb {
+  width: 60px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+/* Download button styling */
+.download-btn {
+  float: right;
+  margin-bottom: 1.5rem;
+  background: #ff6b35;
+  padding: 0.6rem 2rem;
+  color: #fff;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.download-btn:hover {
+  background: #e65c2a;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  .section {
+    padding: 1.5rem;
+  }
+
+  .analytics-table, .orders-table {
+    font-size: 0.9em;
+  }
+
+  .btn, button, input[type="submit"] {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Adjust status badge font size for smaller screens */
+  .status-badge {
+    font-size: 0.85em;
+  }
+
+  /* Adjust the width of the download button */
+  .download-btn {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Further decrease padding and adjust layout for mobile */
+  .page-container {
+    padding: 0.5rem;
+  }
+
+  .section {
+    padding: 1rem;
+  }
+
+  .analytics-table, .orders-table {
+    font-size: 0.85em;
+  }
+}

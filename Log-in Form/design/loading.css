@@ -1,0 +1,61 @@
+/* From Uiverse.io by SelfMadeSystem */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f7f8fa;
+  color: #222e3c;
+  margin: 0;
+  padding: 0;
+}
+
+.loader {
+  width: 12em;
+  height: 3em;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 8px solid #8B5C2A; /* brown border */
+  filter: url(#goo); /* make sure you have the SVG filter with id 'goo' declared somewhere */
+}
+
+.loader::before {
+  content: '';
+  width: 22em;
+  height: 18em;
+  background: #8B5C2A;
+  position: absolute;
+  border-radius: 50%;
+  left: -2em;
+  bottom: -18em;
+  animation: wee1 2s linear infinite;
+}
+
+.loader::after {
+  content: '';
+  width: 16em;
+  height: 12em;
+  background: #8B5C2A;
+  position: absolute;
+  border-radius: 50%;
+  left: -4em;
+  bottom: -12em;
+  animation: wee2 2s linear infinite 0.75s;
+}
+
+@keyframes wee1 {
+  0% {
+    transform: translateX(-10em) rotate(0deg);
+  }
+  100% {
+    transform: translateX(7em) rotate(180deg);
+  }
+}
+
+@keyframes wee2 {
+  0% {
+    transform: translateX(-8em) rotate(0deg);
+  }
+  100% {
+    transform: translateX(8em) rotate(180deg);
+  }
+}

@@ -1,0 +1,6 @@
+/vendor/
+Log-in Form/vendor/
+Log-in Form/includes/google-config.php
+Log-in Form/includes/facebook-config.php
+.env
+uploads/
